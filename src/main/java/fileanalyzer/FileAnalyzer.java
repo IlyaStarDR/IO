@@ -8,25 +8,20 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class FileAnalyzer {
-    private String path;
-    private String word;
 
     public static void main(String[] args) throws IOException, IllegalStateException {
-        FileAnalyzer fileAnalyzer = new FileAnalyzer(args[0], args[1]);
-        fileAnalyzer.printCountWordOccurrencesInFile();
-        fileAnalyzer.printSentencesInWhichWordOccurredInFile();
+        String pathToFile = args[0];
+        String word = args[1];
+        String fileContent = getStringContentOfFile(pathToFile);
+        int wordOccurrencesInFile = getCountWordOccurrencesInString(fileContent, word);
+        ArrayList<String> sentencesWordOccurrences = getSentencesInWhichWordOccurredInString(fileContent, word);
+        printCountWordOccurrencesInFile(wordOccurrencesInFile, word);
+        printSentencesInWhichWordOccurredInFile(sentencesWordOccurrences, word);
     }
 
-    protected FileAnalyzer(String path, String word) {
-        this.path = path;
-        this.word = word;
-    }
-
-    public int getCountWordOccurrencesInFile() throws IOException {
-        String stringFileContent = getStringContentOfFile();
-
+    public static int getCountWordOccurrencesInString(String fileContent, String word) {
         Pattern pattern = Pattern.compile("\s*" + word + "\s*[,.?!]*");
-        Matcher matcher = pattern.matcher(stringFileContent);
+        Matcher matcher = pattern.matcher(fileContent);
 
         int count = 0;
         while (matcher.find()) {
@@ -35,11 +30,9 @@ public class FileAnalyzer {
         return count;
     }
 
-    public ArrayList<String> getSentencesInWhichWordOccurredInFile() throws IOException {
-        String stringFileContent = getStringContentOfFile();
-
+    public static ArrayList<String> getSentencesInWhichWordOccurredInString(String fileContent, String word) {
         Pattern pattern = Pattern.compile("\\s*[^.!?]*" + word + "\\s*[^.!?]*[.!?]");
-        Matcher matcher = pattern.matcher(stringFileContent);
+        Matcher matcher = pattern.matcher(fileContent);
 
         ArrayList<String> sentences = new ArrayList<>();
         while (matcher.find()) {
@@ -48,21 +41,20 @@ public class FileAnalyzer {
         return sentences;
     }
 
-    private void printCountWordOccurrencesInFile() throws IOException {
-        System.out.println("Found " + getCountWordOccurrencesInFile() + " occurrences of word \033[3m" + word + "\033[0m in text");
+    private static void printCountWordOccurrencesInFile(int count, String word) {
+        System.out.println("Found " + count + " occurrences of word \033[3m" + word + "\033[0m in text");
     }
 
-    private void printSentencesInWhichWordOccurredInFile() throws IOException {
-        ArrayList<String> sentences = getSentencesInWhichWordOccurredInFile();
+    private static void printSentencesInWhichWordOccurredInFile(ArrayList<String> sentences, String word) {
         for (String sentence : sentences) {
             System.out.println(sentence.replaceAll(word, "\u001B[32m" + word + "\u001B[0m"));
         }
     }
 
-    private String getStringContentOfFile() throws IOException, IllegalStateException {
-        File file = new File(path);
+    public static String getStringContentOfFile(String pathToFile) throws IOException, IllegalStateException {
+        File file = new File(pathToFile);
         if (!file.isFile()) {
-            throw new IllegalStateException("File not found in path: " + path);
+            throw new IllegalStateException("File not found in path: " + pathToFile);
         }
         FileInputStream textFile = new FileInputStream(file);
         byte[] fileContent = textFile.readAllBytes();

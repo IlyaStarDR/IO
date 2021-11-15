@@ -10,7 +10,7 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class FileManagerTest {
+public class FileManagerITest {
     private final static String path = "src/test/resources/filemanager/testdata";
     private final static FileManager fileManager = new FileManager();
 
